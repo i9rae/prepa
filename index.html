@@ -582,8 +582,8 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
     <div id="nav-filieres"></div>
 
     <div class="sidebar-footer">
-      <button class="admin-link" onclick="openAdmin()">
-        ⚙️ Panneau administrateur
+      <button class="admin-link" onclick="askAdminPassword()">
+        ⚙️ Administration
       </button>
     </div>
   </aside>
@@ -1181,6 +1181,15 @@ function emptyState(title, msg) {
 }
 
 // ─── ADMIN ───
+function askAdminPassword() {
+  const pwd = prompt('🔒 Mot de passe administrateur :');
+  if (pwd === null) return; // annulé
+  if (pwd === 'cpgemaroc') {
+    openAdmin();
+  } else {
+    alert('❌ Mot de passe incorrect.');
+  }
+}
 function openAdmin() { document.getElementById('admin-overlay').classList.add('open'); }
 function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
 function closeAdminIfBg(e) { if(e.target === document.getElementById('admin-overlay')) closeAdmin(); }
