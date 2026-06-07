@@ -10,13 +10,13 @@
   --bg: #f5f3ef;
   --bg2: #ede9e2;
   --bg3: #e2ddd5;
-  --ink: #1a1814;
-  --ink2: #3d3a35;
-  --ink3: #7a766e;
-  --accent: #c1440e;
-  --accent2: #e8632a;
+  --ink: #1a3a2a;
+  --ink2: #2d5040;
+  --ink3: #5a7a6a;
+  --accent: #1a7a4a;
+  --accent2: #2da866;
   --gold: #b8860b;
-  --green: #2d6a4f;
+  --green: #1a7a4a;
   --blue: #1b4f72;
   --purple: #4a235a;
   --border: rgba(26,24,20,0.12);
@@ -40,7 +40,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 
 /* ── SIDEBAR ── */
 .sidebar {
-  background: var(--ink);
+  background: #0d4a2a;
   color: #f5f3ef;
   display: flex;
   flex-direction: column;
@@ -92,7 +92,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
   text-align:center;
   letter-spacing:.04em;
 }
-.year-tab.active, .year-tab:hover { background:rgba(193,68,14,0.25); border-color:rgba(193,68,14,0.5); color:#f5f3ef; }
+.year-tab.active, .year-tab:hover { background:rgba(45,168,102,0.25); border-color:rgba(45,168,102,0.5); color:#f5f3ef; }
 
 /* FILIERE */
 .nav-section {
@@ -122,7 +122,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
   text-align:left;
 }
 .filiere-btn:hover { color:#f5f3ef; background:rgba(255,255,255,0.04); }
-.filiere-btn.active { color:#f5f3ef; border-left-color:var(--accent); background:rgba(193,68,14,0.1); }
+.filiere-btn.active { color:#f5f3ef; border-left-color:#2da866; background:rgba(45,168,102,0.18); }
 .filiere-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .dot-mp{background:#c1440e;} .dot-psi{background:#2d6a4f;} .dot-tsi{background:#b8860b;} .dot-mpsi{background:#c1440e;} .dot-pcsi{background:#1b4f72;} .dot-tsi1{background:#b8860b;}
 
@@ -543,16 +543,65 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 
 @media(max-width:900px) {
   .app { grid-template-columns:1fr; }
-  .sidebar { position:fixed; left:-280px; transition:.3s; height:100vh; z-index:50; }
+  .sidebar { position:fixed; left:-285px; transition:.3s; height:100vh; z-index:50; width:285px; box-shadow:4px 0 20px rgba(0,0,0,0.3); }
   .sidebar.open { left:0; }
   .main { min-height:100vh; }
-  .topbar { padding:0 1.2rem; }
-  .hero-banner { padding:2rem 1.5rem; }
-  .overview { padding:1.5rem; }
-  .hb-stats { flex-wrap:wrap; gap:1rem; }
+  .topbar { padding:0 1rem; }
+  .hero-banner { padding:1.8rem 1.2rem; }
+  .hero-banner .hb-title { font-size:1.7rem; }
+  .overview { padding:1rem; }
+  .hb-stats { flex-wrap:wrap; gap:.8rem; }
+  .hb-stat { border-left-width:2px; padding-left:.7rem; }
+  .hb-stat-n { font-size:1.3rem; }
   .form-row2 { grid-template-columns:1fr; }
   .hamburger { display:flex; }
+  .filiere-header { flex-wrap:wrap; gap:8px; }
+  .filiere-badge { font-size:1.6rem; padding:3px 12px; }
+  .matiere-tabs { gap:4px; overflow-x:auto; flex-wrap:nowrap; padding-bottom:2px; }
+  .matiere-tabs::-webkit-scrollbar { height:2px; }
+  .mat-tab { white-space:nowrap; padding:8px 12px; font-size:0.8rem; flex-shrink:0; }
+  .content-tabs { gap:6px; overflow-x:auto; flex-wrap:nowrap; }
+  .ct-tab { white-space:nowrap; flex-shrink:0; padding:7px 14px; font-size:0.78rem; }
+  .chapters-grid { grid-template-columns:1fr; }
+  .docs-grid { grid-template-columns:1fr 1fr; }
+  .concours-grid { grid-template-columns:1fr; }
+  .cours-header { padding:12px; }
+  .cours-body { padding:10px 12px 12px 12px; }
+  .pdf-pair { flex-direction:column; }
+  .pdf-btn { width:100%; justify-content:center; padding:10px; }
+  .admin-body { padding:1.2rem; }
+  .admin-tabs2 { overflow-x:auto; flex-wrap:nowrap; gap:2px; }
+  .admin-tabs2::-webkit-scrollbar { height:2px; }
+  .at2 { white-space:nowrap; flex-shrink:0; padding:8px 10px; font-size:0.75rem; }
+  .admin-modal { border-radius:12px 12px 0 0; position:fixed; bottom:0; left:0; right:0; width:100%; max-height:92vh; border:none; }
+  .admin-overlay.open { align-items:flex-end; }
+  .fg input, .fg select, .fg textarea { font-size:1rem; padding:11px 12px; }
+  .btn-add { width:100%; text-align:center; justify-content:center; padding:12px; }
+  .guide-box { padding:1rem; }
+  .hero-banner::before, .hero-banner::after { display:none; }
 }
+
+@media(max-width:480px) {
+  .docs-grid { grid-template-columns:1fr; }
+  .hb-stats { gap:.6rem; }
+  .hb-stat-n { font-size:1.1rem; }
+  .hero-banner { padding:1.4rem 1rem; }
+  .overview { padding:.8rem; }
+  .filiere-badge { font-size:1.3rem; }
+  .filiere-info h2 { font-size:1rem; }
+  .topbar { height:50px; }
+  .breadcrumb { font-size:0.75rem; }
+}
+
+/* Overlay sombre derrière sidebar mobile */
+.sidebar-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:49;
+}
+.sidebar-overlay.show { display:block; }
 .hamburger {
   display:none;
   flex-direction:column;
@@ -566,6 +615,9 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 <body>
 
 <div class="app">
+
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
@@ -701,6 +753,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
         <button class="at2" onclick="switchAdminTab('tab-devoir',this)">Devoir surveillé</button>
         <button class="at2" onclick="switchAdminTab('tab-livre',this)">Livre</button>
         <button class="at2" onclick="switchAdminTab('tab-concours',this)">Concours</button>
+        <button class="at2" onclick="switchAdminTab('tab-supprimer',this)" style="color:#c0392b;">🗑 Supprimer</button>
         <button class="at2" onclick="switchAdminTab('tab-guide2',this)">Guide Drive</button>
       </div>
 
@@ -880,6 +933,27 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
         </div>
       </div>
 
+      <!-- TAB SUPPRIMER / ORDONNER -->
+      <div id="tab-supprimer" style="display:none;">
+        <div class="admin-form">
+          <div class="form-row2">
+            <div class="fg">
+              <label>Type de document</label>
+              <select id="del-type" onchange="renderDeleteList()">
+                <option value="exercices">Exercices</option>
+                <option value="devoirs">Devoirs surveillés</option>
+                <option value="livres">Livres</option>
+                <option value="concours">Concours</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:0.78rem;color:var(--ink3);padding:6px 0;">
+            Utilisez les flèches ↑ ↓ pour changer l'ordre, et 🗑 pour supprimer.
+          </div>
+          <div id="delete-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;"></div>
+        </div>
+      </div>
+
       <!-- TAB GUIDE -->
       <div id="tab-guide2" style="display:none;">
         <div class="guide-box" style="border:none;padding:0;">
@@ -983,7 +1057,7 @@ function selectFiliere(id) {
   currentContent = 'exercices';
   renderNav();
   showFiliere();
-  if(window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+  closeSidebarMobile();
 }
 
 function showHome() {
@@ -1195,10 +1269,65 @@ function closeAdmin() { document.getElementById('admin-overlay').classList.remov
 function closeAdminIfBg(e) { if(e.target === document.getElementById('admin-overlay')) closeAdmin(); }
 
 function switchAdminTab(id, btn) {
-  ['tab-exercice','tab-devoir','tab-livre','tab-concours','tab-guide2'].forEach(t => document.getElementById(t).style.display = 'none');
+  ['tab-exercice','tab-devoir','tab-livre','tab-concours','tab-supprimer','tab-guide2'].forEach(t => document.getElementById(t).style.display = 'none');
   document.getElementById(id).style.display = 'block';
   document.querySelectorAll('.at2').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  if(id === 'tab-supprimer') renderDeleteList();
+}
+
+function renderDeleteList() {
+  const type = document.getElementById('del-type').value;
+  const items = DATA[type];
+  const container = document.getElementById('delete-list');
+  if (items.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3);font-size:0.88rem;">Aucun document dans cette catégorie.</div>`;
+    return;
+  }
+  let html = '';
+  items.forEach((item, i) => {
+    const title = item.cours || item.titre || item.nom || 'Sans titre';
+    const sub = [item.filiere, item.matiere, item.semestre ? 'Sem. ' + item.semestre : '', item.annee || ''].filter(Boolean).join(' · ');
+    const isFirst = i === 0;
+    const isLast = i === items.length - 1;
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;background:white;border:1.5px solid var(--border);border-radius:6px;padding:10px 14px;gap:10px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
+        <div style="font-size:0.72rem;color:var(--ink3);font-family:'DM Mono',monospace;margin-top:2px;">${sub}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0;align-items:center;">
+        <button onclick="moveItem('${type}',${i},-1)" ${isFirst?'disabled':''} title="Monter"
+          style="background:${isFirst?'#eee':'#1a7a4a'};color:${isFirst?'#aaa':'white'};border:none;width:30px;height:30px;border-radius:4px;font-size:0.9rem;cursor:${isFirst?'default':'pointer'};display:flex;align-items:center;justify-content:center;">↑</button>
+        <button onclick="moveItem('${type}',${i},1)" ${isLast?'disabled':''} title="Descendre"
+          style="background:${isLast?'#eee':'#1a7a4a'};color:${isLast?'#aaa':'white'};border:none;width:30px;height:30px;border-radius:4px;font-size:0.9rem;cursor:${isLast?'default':'pointer'};display:flex;align-items:center;justify-content:center;">↓</button>
+        <button onclick="deleteItem('${type}',${i})" title="Supprimer"
+          style="background:#c0392b;color:white;border:none;padding:6px 12px;border-radius:4px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;">🗑</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function moveItem(type, index, direction) {
+  const items = DATA[type];
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= items.length) return;
+  const temp = items[index];
+  items[index] = items[newIndex];
+  items[newIndex] = temp;
+  save();
+  renderDeleteList();
+  if(currentFiliere) renderContent();
+}
+
+function deleteItem(type, index) {
+  const item = DATA[type][index];
+  const title = item.cours || item.titre || item.nom || 'ce document';
+  if (!confirm(`Supprimer "${title}" ?`)) return;
+  DATA[type].splice(index, 1);
+  save();
+  renderDeleteList();
+  if(currentFiliere) renderContent();
 }
 
 function normalizeFiliere(name) {
@@ -1280,7 +1409,20 @@ function addConcours() {
   if(currentFiliere) renderContent();
 }
 
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+
+// Fermer sidebar quand on sélectionne une filière sur mobile
+function closeSidebarMobile() {
+  if(window.innerWidth < 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('show');
+  }
+}
 
 // INIT
 renderNav();
