@@ -1588,30 +1588,6 @@ function deleteItem(type, index) {
   deleteFromFirebase(type, index);
 }
 
-// Exposer les fonctions globalement (nécessaire avec type="module")
-window.toggleMobileDropdown = toggleMobileDropdown;
-window.closeMobileDropdown = closeMobileDropdown;
-window.selectMobileYear = selectMobileYear;
-window.selectMobileFiliere = selectMobileFiliere;
-window.selectYear = selectYear;
-window.selectFiliere = selectFiliere;
-window.showHome = showHome;
-window.selectMatiere = selectMatiere;
-window.selectContent = selectContent;
-window.askAdminPassword = askAdminPassword;
-window.openAdmin = openAdmin;
-window.closeAdmin = closeAdmin;
-window.closeAdminIfBg = closeAdminIfBg;
-window.switchAdminTab = switchAdminTab;
-window.renderDeleteList = renderDeleteList;
-window.moveItem = moveItem;
-window.deleteItem = deleteItem;
-window.addExercice = addExercice;
-window.addDevoir = addDevoir;
-window.addLivre = addLivre;
-window.addConcours = addConcours;
-window.toggleSidebar = toggleSidebar;
-
 function normalizeFiliere(name) {
   const map = {'MPSI':'mpsi','PCSI':'pcsi','TSI (1ère)':'tsi1','MP':'mp','PSI':'psi','TSI (2ème)':'tsi2'};
   return map[name] || name.toLowerCase().replace(/\s/g,'');
@@ -1717,6 +1693,30 @@ function closeSidebarMobile() {
     document.getElementById('sidebar-overlay').classList.remove('show');
   }
 }
+
+// ─── EXPOSER GLOBALEMENT (requis avec type="module") ───
+window.toggleMobileDropdown = toggleMobileDropdown;
+window.closeMobileDropdown = closeMobileDropdown;
+window.selectMobileYear = selectMobileYear;
+window.selectMobileFiliere = selectMobileFiliere;
+window.selectYear = selectYear;
+window.selectFiliere = selectFiliere;
+window.showHome = showHome;
+window.selectMatiere = selectMatiere;
+window.selectContent = selectContent;
+window.askAdminPassword = askAdminPassword;
+window.openAdmin = openAdmin;
+window.closeAdmin = closeAdmin;
+window.closeAdminIfBg = closeAdminIfBg;
+window.switchAdminTab = switchAdminTab;
+window.renderDeleteList = renderDeleteList;
+window.moveItem = moveItem;
+window.deleteItem = deleteItem;
+window.addExercice = addExercice;
+window.addDevoir = addDevoir;
+window.addLivre = addLivre;
+window.addConcours = addConcours;
+window.toggleSidebar = toggleSidebar;
 
 // INIT
 renderNav();
