@@ -1153,34 +1153,84 @@ const MAT_ICON = {'Mathématiques':'∑','Physique':'⚛','Chimie':'⚗','SI':'�
 // ─── DATA (chargé depuis Firebase) ───
 let DATA = { exercices:[], devoirs:[], livres:[], concours:[] };
 
-// Afficher indicateur de chargement
-function showLoading(msg) {
-  const area = document.getElementById('content-area');
-  if(area) area.innerHTML = `<div class="empty-state"><div class="es-icon" style="animation:spin 1s linear infinite;display:inline-block;">⏳</div><p>${msg || 'Chargement...'}</p></div>`;
-}
-
-// Charger toutes les données depuis Firebase
+// Charger toutes les données depuis Firebase (une seule collection "ressources")
 async function loadFromFirebase() {
   try {
-    const types = ['exercices','devoirs','livres','concours'];
-    for(const type of types) {
-      const snap = await getDocs(collection(db, type));
-      DATA[type] = [];
-      snap.forEach(d => DATA[type].push({ _id: d.id, ...d.data() }));
+    // Essayer plusieurs noms de collection possibles
+    const collectionsToTry = ['ressources', 'documents', 'cours', 'exercices'];
+    let allDocs = [];
+
+    for(const colName of collectionsToTry) {
+      try {
+        const snap = await getDocs(collection(db, colName));
+        if(!snap.empty) {
+          snap.forEach(d => allDocs.push({ _id: d.id, _collection: colName, ...d.data() }));
+        }
+      } catch(e) {}
     }
+
+    // Classer les documents selon leur catégorie
+    DATA = { exercices:[], devoirs:[], livres:[], concours:[] };
+    allDocs.forEach(item => {
+      // Normaliser les champs (supporter url ou link, filière ou filiere, matière ou matiere)
+      const normalized = {
+        _id: item._id,
+        _collection: item._collection,
+        filiere: item['filière'] || item['filiere'] || item['Filière'] || item['Filiere'] || '',
+        matiere: item['matière'] || item['matiere'] || item['Matière'] || item['Matiere'] || '',
+        titre: item['titre'] || item['Titre'] || item['cours'] || item['nom'] || '',
+        link: item['url'] || item['link'] || item['lien'] || item['URL'] || '',
+        correction: item['correction'] || item['Correction'] || item['urlCorrection'] || '',
+        semestre: item['semestre'] || item['Semestre'] || '1',
+        annee: item['annee'] || item['année'] || '',
+        auteur: item['auteur'] || item['Auteur'] || '',
+      };
+
+      const cat = (item['catégorie'] || item['categorie'] || item['Catégorie'] || item['type'] || item['Type'] || '').toLowerCase();
+
+      if(cat.includes('exercice') || cat.includes('exercices')) {
+        normalized.cours = normalized.titre;
+        DATA.exercices.push(normalized);
+      } else if(cat.includes('devoir') || cat.includes('ds') || cat.includes('surveillé')) {
+        DATA.devoirs.push(normalized);
+      } else if(cat.includes('livre') || cat.includes('book')) {
+        DATA.livres.push(normalized);
+      } else if(cat.includes('concours')) {
+        normalized.nom = normalized.titre;
+        DATA.concours.push(normalized);
+      } else {
+        // Si pas de catégorie reconnue, mettre dans exercices par défaut
+        normalized.cours = normalized.titre;
+        DATA.exercices.push(normalized);
+      }
+    });
+
     updateTotalDocs();
     if(currentFiliere) renderContent();
+
   } catch(e) {
     console.error('Erreur Firebase:', e);
-    alert('⚠️ Impossible de se connecter à la base de données. Vérifiez votre connexion internet.');
   }
 }
 
-// Sauvegarder dans Firebase
+// Sauvegarder dans Firebase (format adapté à votre structure)
 async function saveToFirebase(type, item) {
   try {
-    const docRef = await addDoc(collection(db, type), item);
+    // Convertir vers votre format Firebase
+    const firebaseDoc = {
+      'catégorie': type === 'exercices' ? 'Exercices' : type === 'devoirs' ? 'Devoirs surveillés' : type === 'livres' ? 'Livre' : 'Concours',
+      'filière': item.filiere,
+      'matière': item.matiere,
+      'titre': item.cours || item.titre || item.nom || '',
+      'url': item.link,
+      'semestre': item.semestre || '1',
+      'correction': item.correction || '',
+      'auteur': item.auteur || '',
+      'annee': item.annee || '',
+    };
+    const docRef = await addDoc(collection(db, 'ressources'), firebaseDoc);
     item._id = docRef.id;
+    item._collection = 'ressources';
     DATA[type].push(item);
     updateTotalDocs();
     if(currentFiliere) renderContent();
@@ -1197,7 +1247,8 @@ async function deleteFromFirebase(type, index) {
   const item = DATA[type][index];
   if(!item._id) { alert('Erreur: document sans ID'); return; }
   try {
-    await deleteDoc(doc(db, type, item._id));
+    const colName = item._collection || 'ressources';
+    await deleteDoc(doc(db, colName, item._id));
     DATA[type].splice(index, 1);
     updateTotalDocs();
     renderDeleteList();
@@ -1398,17 +1449,23 @@ function renderContent() {
 
 // ─── RENDER EXERCICES ───
 function renderExercices(fId, matiere, area) {
-  const fName = currentFiliere.name;
-  const items = DATA.exercices.filter(e => normalizeFiliere(e.filiere) === fId && e.matiere === matiere);
-  const s1 = items.filter(e => e.semestre == 1);
-  const s2 = items.filter(e => e.semestre == 2);
+  const items = DATA.exercices.filter(e => {
+    const ef = (e.filiere || '').toLowerCase().trim();
+    const mf = normalizeFiliere2(fId);
+    const em = (e.matiere || '').toLowerCase().trim();
+    return ef === mf && em === matiere.toLowerCase().trim();
+  });
+  const s1 = items.filter(e => String(e.semestre) === '1');
+  const s2 = items.filter(e => String(e.semestre) === '2');
+  const sAll = items.filter(e => !e.semestre || (String(e.semestre) !== '1' && String(e.semestre) !== '2'));
 
   let html = '';
   if (items.length === 0) {
     html = emptyState('Aucun exercice pour le moment', 'Ajoutez vos exercices depuis le panneau administrateur.');
   } else {
-    if(s1.length) html += renderSemestre('1er Semestre', s1, 'exercice');
-    if(s2.length) html += renderSemestre('2ème Semestre', s2, 'exercice');
+    if(s1.length) html += renderSemestre('1er Semestre', s1);
+    if(s2.length) html += renderSemestre('2ème Semestre', s2);
+    if(sAll.length) html += renderSemestre('Exercices', sAll);
   }
   area.innerHTML = html;
   area.querySelectorAll('.cours-header').forEach(h => h.addEventListener('click', () => {
@@ -1416,14 +1473,15 @@ function renderExercices(fId, matiere, area) {
   }));
 }
 
-function renderSemestre(label, items, type) {
+function renderSemestre(label, items) {
   let html = `<div class="cours-section"><div class="sem-label">${label}</div>`;
   items.forEach((item, i) => {
+    const title = item.cours || item.titre || item.nom || 'Sans titre';
     html += `<div class="cours-row">
       <div class="cours-header">
         <div class="ch-left">
           <span class="ch-num">0${i+1}</span>
-          <span class="ch-title">${item.cours || item.titre}</span>
+          <span class="ch-title">${title}</span>
         </div>
         <span class="ch-arrow">›</span>
       </div>
@@ -1441,53 +1499,53 @@ function renderSemestre(label, items, type) {
 
 // ─── RENDER DEVOIRS ───
 function renderDevoirs(fId, matiere, area) {
-  const items = DATA.devoirs.filter(e => normalizeFiliere(e.filiere) === fId && e.matiere === matiere);
-  const s1 = items.filter(e => e.semestre == 1);
-  const s2 = items.filter(e => e.semestre == 2);
+  const items = DATA.devoirs.filter(e => {
+    const ef = (e.filiere || '').toLowerCase().trim();
+    const mf = normalizeFiliere2(fId);
+    const em = (e.matiere || '').toLowerCase().trim();
+    return ef === mf && em === matiere.toLowerCase().trim();
+  });
+  const s1 = items.filter(e => String(e.semestre) === '1');
+  const s2 = items.filter(e => String(e.semestre) === '2');
+  const sAll = items.filter(e => !e.semestre || (String(e.semestre) !== '1' && String(e.semestre) !== '2'));
 
+  if (items.length === 0) { area.innerHTML = emptyState('Aucun devoir surveillé', 'Ajoutez vos devoirs depuis le panneau administrateur.'); return; }
   let html = '';
-  if (items.length === 0) {
-    area.innerHTML = emptyState('Aucun devoir surveillé', 'Ajoutez vos devoirs depuis le panneau administrateur.');
-    return;
-  }
-  if(s1.length) {
-    html += `<div class="sem-label">1er Semestre</div><div class="docs-grid">`;
-    s1.forEach(d => html += docCard('📝', d.titre, 'DS', d.link, d.correction));
-    html += `</div>`;
-  }
-  if(s2.length) {
-    html += `<div class="sem-label">2ème Semestre</div><div class="docs-grid">`;
-    s2.forEach(d => html += docCard('📝', d.titre, 'DS', d.link, d.correction));
-    html += `</div>`;
-  }
+  if(s1.length) { html += `<div class="sem-label">1er Semestre</div><div class="docs-grid">`; s1.forEach(d => html += docCard('📝', d.titre||d.cours||'DS', 'DS', d.link, d.correction)); html += `</div>`; }
+  if(s2.length) { html += `<div class="sem-label">2ème Semestre</div><div class="docs-grid">`; s2.forEach(d => html += docCard('📝', d.titre||d.cours||'DS', 'DS', d.link, d.correction)); html += `</div>`; }
+  if(sAll.length) { html += `<div class="docs-grid">`; sAll.forEach(d => html += docCard('📝', d.titre||d.cours||'DS', 'DS', d.link, d.correction)); html += `</div>`; }
   area.innerHTML = html;
 }
 
 // ─── RENDER LIVRES ───
 function renderLivres(fId, matiere, area) {
-  const items = DATA.livres.filter(e => normalizeFiliere(e.filiere) === fId && e.matiere === matiere);
-  if (items.length === 0) {
-    area.innerHTML = emptyState('Aucun livre', 'Ajoutez vos livres depuis le panneau administrateur.');
-    return;
-  }
+  const items = DATA.livres.filter(e => {
+    const ef = (e.filiere || '').toLowerCase().trim();
+    const mf = normalizeFiliere2(fId);
+    const em = (e.matiere || '').toLowerCase().trim();
+    return ef === mf && em === matiere.toLowerCase().trim();
+  });
+  if (items.length === 0) { area.innerHTML = emptyState('Aucun livre', 'Ajoutez vos livres depuis le panneau administrateur.'); return; }
   let html = `<div class="docs-grid">`;
-  items.forEach(l => html += docCard('📚', l.titre, l.auteur || 'Auteur', l.link, null));
+  items.forEach(l => html += docCard('📚', l.titre||'Livre', l.auteur || 'Auteur', l.link, null));
   html += `</div>`;
   area.innerHTML = html;
 }
 
 // ─── RENDER CONCOURS ───
 function renderConcoursView(fId, matiere, area) {
-  const items = DATA.concours.filter(e => normalizeFiliere(e.filiere) === fId && e.matiere === matiere);
-  if (items.length === 0) {
-    area.innerHTML = emptyState('Aucun concours', 'Ajoutez vos concours depuis le panneau administrateur.');
-    return;
-  }
+  const items = DATA.concours.filter(e => {
+    const ef = (e.filiere || '').toLowerCase().trim();
+    const mf = normalizeFiliere2(fId);
+    const em = (e.matiere || '').toLowerCase().trim();
+    return ef === mf && em === matiere.toLowerCase().trim();
+  });
+  if (items.length === 0) { area.innerHTML = emptyState('Aucun concours', 'Ajoutez vos concours depuis le panneau administrateur.'); return; }
   let html = `<div class="concours-grid">`;
   items.forEach(c => {
     html += `<div class="concours-card">
       <div class="cc-year">${c.annee || ''}</div>
-      <div class="cc-title">${c.nom}</div>
+      <div class="cc-title">${c.nom || c.titre || ''}</div>
       <div style="font-size:0.78rem;color:var(--ink3);">${matiere}</div>
       <div class="cc-btns">
         <a class="doc-mini-btn" href="${c.link}" target="_blank">📄 Sujet</a>
@@ -1591,6 +1649,12 @@ function deleteItem(type, index) {
 function normalizeFiliere(name) {
   const map = {'MPSI':'mpsi','PCSI':'pcsi','TSI (1ère)':'tsi1','MP':'mp','PSI':'psi','TSI (2ème)':'tsi2'};
   return map[name] || name.toLowerCase().replace(/\s/g,'');
+}
+
+// Convertit un id de filière (ex: 'mpsi') en nom lisible pour comparer avec Firebase
+function normalizeFiliere2(fId) {
+  const map = {'mpsi':'mpsi','pcsi':'pcsi','tsi1':'tsi','mp':'mp','psi':'psi','tsi2':'tsi'};
+  return (map[fId] || fId).toLowerCase();
 }
 
 function showOk(id) {
