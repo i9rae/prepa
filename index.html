@@ -516,8 +516,41 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 .cc-title { font-weight:700; font-size:0.95rem; margin-bottom:.4rem; }
 .cc-btns { display:flex; gap:8px; margin-top:.8rem; }
 
-/* GUIDE */
-.guide-box {
+/* SITES UTILES */
+.sites-utiles-btn {
+  background: #0d4a2a;
+  color: #f5f3ef;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+  white-space: nowrap;
+}
+.sites-utiles-btn:hover { background: #1a7a4a; }
+.site-link-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: .18s;
+  margin-bottom: 2px;
+}
+.site-link-item:hover { background: var(--bg2); }
+.sli-icon { font-size: 1.2rem; flex-shrink: 0; width: 28px; text-align: center; }
+.sli-title { font-size: 0.88rem; font-weight: 600; line-height: 1.3; }
+.sli-url { font-size: 0.72rem; color: var(--ink3); font-family: 'DM Mono', monospace; margin-top: 1px; }
+
+@media(max-width:900px) {
+  .sites-utiles-btn { display: none; }
+}
+
   background:white;
   border:1.5px solid var(--border);
   border-radius:var(--r);
@@ -765,6 +798,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
         </div>
         <div class="mobile-filiere-list" id="mobile-filiere-list"></div>
         <button class="mobile-admin-btn" onclick="closeMobileDropdown();askAdminPassword()">⚙️ Administration</button>
+        <button class="mobile-admin-btn" onclick="closeMobileDropdown();showSitesMobile()">🔗 Sites utiles</button>
       </div>
     </nav>
 
@@ -773,6 +807,72 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
         <div class="breadcrumb" id="breadcrumb">
           <span>Accueil</span>
         </div>
+      </div>
+      <button class="sites-utiles-btn" onclick="toggleSitesUtiles()">🔗 Sites utiles</button>
+    </div>
+
+    <!-- SITES UTILES DROPDOWN -->
+    <div id="sites-utiles-panel" style="display:none;position:fixed;top:56px;right:0;width:min(380px,100vw);max-height:80vh;overflow-y:auto;background:white;border-left:1px solid var(--border);border-bottom:1px solid var(--border);box-shadow:-4px 4px 24px rgba(0,0,0,0.1);z-index:99;border-radius:0 0 0 10px;">
+      <div style="background:#0d4a2a;color:#f5f3ef;padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Fraunces',serif;font-weight:700;font-style:italic;font-size:1rem;">Sites utiles</div>
+        <button onclick="toggleSitesUtiles()" style="background:none;border:none;color:rgba(245,243,239,0.6);font-size:1.1rem;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:.8rem;">
+        <div style="font-size:0.75rem;color:var(--ink3);font-family:'DM Mono',monospace;padding:.5rem .8rem;letter-spacing:.08em;">RESSOURCES EN LIGNE</div>
+        <a href="https://lgarcin.github.io/" target="_blank" class="site-link-item">
+          <span class="sli-icon">📐</span><div><div class="sli-title">Cours de Mathématiques</div><div class="sli-url">lgarcin.github.io</div></div>
+        </a>
+        <a href="http://laminehoucin.blogspot.com/" target="_blank" class="site-link-item">
+          <span class="sli-icon">📚</span><div><div class="sli-title">Blog Lamine Houcin</div><div class="sli-url">laminehoucin.blogspot.com</div></div>
+        </a>
+        <a href="https://www.mpsi-saintbrieuc.fr/devoirs-de-maths" target="_blank" class="site-link-item">
+          <span class="sli-icon">✏️</span><div><div class="sli-title">Devoirs de Maths MPSI</div><div class="sli-url">mpsi-saintbrieuc.fr</div></div>
+        </a>
+        <a href="https://e-preparatoire.blogspot.com/" target="_blank" class="site-link-item">
+          <span class="sli-icon">🎓</span><div><div class="sli-title">E-Préparatoire</div><div class="sli-url">e-preparatoire.blogspot.com</div></div>
+        </a>
+        <a href="http://desaintar.free.fr/ds.php" target="_blank" class="site-link-item">
+          <span class="sli-icon">📝</span><div><div class="sli-title">Devoirs Surveillés</div><div class="sli-url">desaintar.free.fr</div></div>
+        </a>
+        <a href="https://www.booleanopera.fr/DM_MPSI.php" target="_blank" class="site-link-item">
+          <span class="sli-icon">🔢</span><div><div class="sli-title">DM MPSI — Boolean Opera</div><div class="sli-url">booleanopera.fr</div></div>
+        </a>
+        <a href="https://maths-france.fr/" target="_blank" class="site-link-item">
+          <span class="sli-icon">🇫🇷</span><div><div class="sli-title">Maths France</div><div class="sli-url">maths-france.fr</div></div>
+        </a>
+        <a href="https://elearning-cpge.com/biblio-ouvrages/" target="_blank" class="site-link-item">
+          <span class="sli-icon">📖</span><div><div class="sli-title">Bibliothèque CPGE</div><div class="sli-url">elearning-cpge.com</div></div>
+        </a>
+        <a href="https://christophebertault.fr/" target="_blank" class="site-link-item">
+          <span class="sli-icon">👨‍🏫</span><div><div class="sli-title">Christophe Bertault</div><div class="sli-url">christophebertault.fr</div></div>
+        </a>
+        <a href="http://alain.troesch.free.fr/" target="_blank" class="site-link-item">
+          <span class="sli-icon">📐</span><div><div class="sli-title">Alain Troesch</div><div class="sli-url">alain.troesch.free.fr</div></div>
+        </a>
+        <a href="https://mickaelprost.fr/index.html" target="_blank" class="site-link-item">
+          <span class="sli-icon">🧮</span><div><div class="sli-title">Mickaël Prost</div><div class="sli-url">mickaelprost.fr</div></div>
+        </a>
+        <a href="https://www.iamateacher.org/" target="_blank" class="site-link-item">
+          <span class="sli-icon">🎯</span><div><div class="sli-title">I Am A Teacher</div><div class="sli-url">iamateacher.org</div></div>
+        </a>
+        <a href="https://mathscpge.wordpress.com/" target="_blank" class="site-link-item">
+          <span class="sli-icon">∑</span><div><div class="sli-title">Maths CPGE</div><div class="sli-url">mathscpge.wordpress.com</div></div>
+        </a>
+        <a href="https://mathematiques.elodiebouchet.fr/" target="_blank" class="site-link-item">
+          <span class="sli-icon">📊</span><div><div class="sli-title">Élodie Bouchet — Mathématiques</div><div class="sli-url">mathematiques.elodiebouchet.fr</div></div>
+        </a>
+        <a href="https://inglart-maths.ovh/" target="_blank" class="site-link-item">
+          <span class="sli-icon">📐</span><div><div class="sli-title">Inglart Maths</div><div class="sli-url">inglart-maths.ovh</div></div>
+        </a>
+        <a href="https://mathcpge.org/DevoirsMathsPCSI.html" target="_blank" class="site-link-item">
+          <span class="sli-icon">✏️</span><div><div class="sli-title">Devoirs Maths PCSI</div><div class="sli-url">mathcpge.org</div></div>
+        </a>
+        <a href="https://www.alkendy.ma/PageMPSI.htm" target="_blank" class="site-link-item">
+          <span class="sli-icon">🇲🇦</span><div><div class="sli-title">Alkendy — MPSI Maroc</div><div class="sli-url">alkendy.ma</div></div>
+        </a>
+        <a href="https://www.math93.com/index.php/superieur/maths-sup" target="_blank" class="site-link-item">
+          <span class="sli-icon">🔢</span><div><div class="sli-title">Math93 — Maths Sup</div><div class="sli-url">math93.com</div></div>
+        </a>
       </div>
     </div>
 
@@ -1700,6 +1800,25 @@ async function addConcours() {
     showOk('ok-co');
   }
 }
+
+function showSitesMobile() {
+  const panel = document.getElementById('sites-utiles-panel');
+  if(panel) { panel.style.display = 'block'; panel.style.top = '54px'; panel.style.width = '100vw'; panel.style.borderRadius = '0'; }
+}
+
+function toggleSitesUtiles() {
+  const panel = document.getElementById('sites-utiles-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+// Fermer le panel si on clique ailleurs
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('sites-utiles-panel');
+  const btn = document.querySelector('.sites-utiles-btn');
+  if(panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+    panel.style.display = 'none';
+  }
+});
 
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
