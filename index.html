@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prépa Excellence — Cours & Ressources</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;0,900;1,300;1,700&family=DM+Mono:wght@400;500&family=Bricolage+Grotesque:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1116,11 +1118,8 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
   </div>
 </div>
 
-<script type="module">
+<script>
 // ─── FIREBASE ───
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyCcHyJwYi9EyKvkoy2KAigv3ZIR_rptDhA",
   authDomain: "prepa-excellence.firebaseapp.com",
@@ -1129,9 +1128,8 @@ const firebaseConfig = {
   messagingSenderId: "558882187961",
   appId: "1:558882187961:web:2b29a4a922d8e47e8c4968"
 };
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // ─── DATA STRUCTURE ───
 const FILIERES = {
@@ -1156,58 +1154,33 @@ let DATA = { exercices:[], devoirs:[], livres:[], concours:[] };
 // Charger toutes les données depuis Firebase (une seule collection "ressources")
 async function loadFromFirebase() {
   try {
-    // Essayer plusieurs noms de collection possibles
-    const collectionsToTry = ['ressources', 'documents', 'cours', 'exercices'];
-    let allDocs = [];
-
-    for(const colName of collectionsToTry) {
-      try {
-        const snap = await getDocs(collection(db, colName));
-        if(!snap.empty) {
-          snap.forEach(d => allDocs.push({ _id: d.id, _collection: colName, ...d.data() }));
-        }
-      } catch(e) {}
-    }
-
-    // Classer les documents selon leur catégorie
+    const snap = await db.collection('ressources').get();
     DATA = { exercices:[], devoirs:[], livres:[], concours:[] };
-    allDocs.forEach(item => {
-      // Normaliser les champs (supporter url ou link, filière ou filiere, matière ou matiere)
+    snap.forEach(d => {
+      const item = { _id: d.id, ...d.data() };
       const normalized = {
         _id: item._id,
-        _collection: item._collection,
-        filiere: item['filière'] || item['filiere'] || item['Filière'] || item['Filiere'] || '',
-        matiere: item['matière'] || item['matiere'] || item['Matière'] || item['Matiere'] || '',
-        titre: item['titre'] || item['Titre'] || item['cours'] || item['nom'] || '',
-        link: item['url'] || item['link'] || item['lien'] || item['URL'] || '',
-        correction: item['correction'] || item['Correction'] || item['urlCorrection'] || '',
-        semestre: item['semestre'] || item['Semestre'] || '1',
-        annee: item['annee'] || item['année'] || '',
-        auteur: item['auteur'] || item['Auteur'] || '',
+        filiere: (item['filière'] || item['filiere'] || '').trim(),
+        matiere: (item['matière'] || item['matiere'] || '').trim(),
+        titre: (item['titre'] || item['cours'] || item['nom'] || '').trim(),
+        link: (item['url'] || item['link'] || '').trim(),
+        correction: (item['correction'] || '').trim(),
+        semestre: String(item['semestre'] || '1').trim(),
+        annee: (item['annee'] || item['année'] || '').trim(),
+        auteur: (item['auteur'] || '').trim(),
       };
+      normalized.cours = normalized.titre;
+      normalized.nom = normalized.titre;
 
-      const cat = (item['catégorie'] || item['categorie'] || item['Catégorie'] || item['type'] || item['Type'] || '').toLowerCase();
-
-      if(cat.includes('exercice') || cat.includes('exercices')) {
-        normalized.cours = normalized.titre;
-        DATA.exercices.push(normalized);
-      } else if(cat.includes('devoir') || cat.includes('ds') || cat.includes('surveillé')) {
-        DATA.devoirs.push(normalized);
-      } else if(cat.includes('livre') || cat.includes('book')) {
-        DATA.livres.push(normalized);
-      } else if(cat.includes('concours')) {
-        normalized.nom = normalized.titre;
-        DATA.concours.push(normalized);
-      } else {
-        // Si pas de catégorie reconnue, mettre dans exercices par défaut
-        normalized.cours = normalized.titre;
-        DATA.exercices.push(normalized);
-      }
+      const cat = (item['catégorie'] || item['categorie'] || item['type'] || '').toLowerCase().trim();
+      if(cat.includes('exercice')) DATA.exercices.push(normalized);
+      else if(cat.includes('devoir') || cat.includes('ds')) DATA.devoirs.push(normalized);
+      else if(cat.includes('livre')) DATA.livres.push(normalized);
+      else if(cat.includes('concours')) DATA.concours.push(normalized);
+      else DATA.exercices.push(normalized);
     });
-
     updateTotalDocs();
     if(currentFiliere) renderContent();
-
   } catch(e) {
     console.error('Erreur Firebase:', e);
   }
@@ -1216,7 +1189,6 @@ async function loadFromFirebase() {
 // Sauvegarder dans Firebase (format adapté à votre structure)
 async function saveToFirebase(type, item) {
   try {
-    // Convertir vers votre format Firebase
     const firebaseDoc = {
       'catégorie': type === 'exercices' ? 'Exercices' : type === 'devoirs' ? 'Devoirs surveillés' : type === 'livres' ? 'Livre' : 'Concours',
       'filière': item.filiere,
@@ -1228,16 +1200,15 @@ async function saveToFirebase(type, item) {
       'auteur': item.auteur || '',
       'annee': item.annee || '',
     };
-    const docRef = await addDoc(collection(db, 'ressources'), firebaseDoc);
+    const docRef = await db.collection('ressources').add(firebaseDoc);
     item._id = docRef.id;
-    item._collection = 'ressources';
     DATA[type].push(item);
     updateTotalDocs();
     if(currentFiliere) renderContent();
     return true;
   } catch(e) {
     console.error('Erreur sauvegarde:', e);
-    alert('⚠️ Erreur lors de la sauvegarde. Vérifiez votre connexion.');
+    alert('⚠️ Erreur lors de la sauvegarde.');
     return false;
   }
 }
@@ -1247,8 +1218,7 @@ async function deleteFromFirebase(type, index) {
   const item = DATA[type][index];
   if(!item._id) { alert('Erreur: document sans ID'); return; }
   try {
-    const colName = item._collection || 'ressources';
-    await deleteDoc(doc(db, colName, item._id));
+    await db.collection('ressources').doc(item._id).delete();
     DATA[type].splice(index, 1);
     updateTotalDocs();
     renderDeleteList();
@@ -1259,28 +1229,16 @@ async function deleteFromFirebase(type, index) {
   }
 }
 
-// Déplacer ordre (mise à jour locale + Firebase)
-async function moveItem(type, index, direction) {
+// Déplacer ordre localement
+function moveItem(type, index, direction) {
   const items = DATA[type];
   const newIndex = index + direction;
   if(newIndex < 0 || newIndex >= items.length) return;
-  // Échanger ordre localement
   const temp = items[index];
   items[index] = items[newIndex];
   items[newIndex] = temp;
-  // Sauvegarder le champ "ordre" dans Firebase
-  try {
-    await setDoc(doc(db, type, items[index]._id), { ...items[index] });
-    await setDoc(doc(db, type, items[newIndex]._id), { ...items[newIndex] });
-  } catch(e) { console.error('Erreur ordre:', e); }
   renderDeleteList();
   if(currentFiliere) renderContent();
-}
-
-function updateTotalDocs() {
-  const t = DATA.exercices.length + DATA.devoirs.length + DATA.livres.length + DATA.concours.length;
-  const el = document.getElementById('total-docs');
-  if(el) el.textContent = t;
 }
 
 function updateTotalDocs() {
@@ -1757,30 +1715,6 @@ function closeSidebarMobile() {
     document.getElementById('sidebar-overlay').classList.remove('show');
   }
 }
-
-// ─── EXPOSER GLOBALEMENT (requis avec type="module") ───
-window.toggleMobileDropdown = toggleMobileDropdown;
-window.closeMobileDropdown = closeMobileDropdown;
-window.selectMobileYear = selectMobileYear;
-window.selectMobileFiliere = selectMobileFiliere;
-window.selectYear = selectYear;
-window.selectFiliere = selectFiliere;
-window.showHome = showHome;
-window.selectMatiere = selectMatiere;
-window.selectContent = selectContent;
-window.askAdminPassword = askAdminPassword;
-window.openAdmin = openAdmin;
-window.closeAdmin = closeAdmin;
-window.closeAdminIfBg = closeAdminIfBg;
-window.switchAdminTab = switchAdminTab;
-window.renderDeleteList = renderDeleteList;
-window.moveItem = moveItem;
-window.deleteItem = deleteItem;
-window.addExercice = addExercice;
-window.addDevoir = addDevoir;
-window.addLivre = addLivre;
-window.addConcours = addConcours;
-window.toggleSidebar = toggleSidebar;
 
 // INIT
 renderNav();
