@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prépa Excellence — Cours & Ressources</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;0,900;1,300;1,700&family=DM+Mono:wght@400;500&family=Bricolage+Grotesque:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -798,7 +796,13 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
         </div>
         <div class="mobile-filiere-list" id="mobile-filiere-list"></div>
         <button class="mobile-admin-btn" onclick="closeMobileDropdown();askAdminPassword()">⚙️ Administration</button>
-        <button class="mobile-admin-btn" onclick="closeMobileDropdown();showSitesMobile()">🔗 Sites utiles</button>
+        <button class="mobile-admin-btn" style="color:#f5f3ef;" onclick="
+          closeMobileDropdown();
+          document.getElementById('view-home').style.display='none';
+          document.getElementById('view-filiere').style.display='none';
+          document.getElementById('view-sites').style.display='block';
+          document.getElementById('breadcrumb').innerHTML='<span>Sites utiles</span>';
+        ">🔗 Sites utiles</button>
       </div>
     </nav>
 
@@ -1283,17 +1287,44 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 </div>
 
 <script>
-// ─── FIREBASE ───
-const firebaseConfig = {
-  apiKey: "AIzaSyCcHyJwYi9EyKvkoy2KAigv3ZIR_rptDhA",
-  authDomain: "prepa-excellence.firebaseapp.com",
-  projectId: "prepa-excellence",
-  storageBucket: "prepa-excellence.firebasestorage.app",
-  messagingSenderId: "558882187961",
-  appId: "1:558882187961:web:2b29a4a922d8e47e8c4968"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// ─── FIREBASE REST API (sans SDK externe) ───
+const FB_PROJECT = 'prepa-excellence';
+const FB_API_KEY = 'AIzaSyCcHyJwYi9EyKvkoy2KAigv3ZIR_rptDhA';
+const FB_BASE = `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents`;
+
+async function fbGetCollection(col) {
+  const res = await fetch(`${FB_BASE}/${col}?key=${FB_API_KEY}`);
+  if(!res.ok) throw new Error('Firestore error: ' + res.status);
+  const data = await res.json();
+  return (data.documents || []).map(doc => {
+    const id = doc.name.split('/').pop();
+    const fields = {};
+    for(const [k, v] of Object.entries(doc.fields || {})) {
+      fields[k] = v.stringValue ?? v.integerValue ?? v.booleanValue ?? '';
+    }
+    return { _id: id, ...fields };
+  });
+}
+
+async function fbAddDoc(col, data) {
+  const fields = {};
+  for(const [k, v] of Object.entries(data)) {
+    fields[k] = { stringValue: String(v) };
+  }
+  const res = await fetch(`${FB_BASE}/${col}?key=${FB_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+  if(!res.ok) throw new Error('Add error: ' + res.status);
+  const doc = await res.json();
+  return doc.name.split('/').pop();
+}
+
+async function fbDeleteDoc(col, id) {
+  const res = await fetch(`${FB_BASE}/${col}/${id}?key=${FB_API_KEY}`, { method: 'DELETE' });
+  if(!res.ok) throw new Error('Delete error: ' + res.status);
+}
 
 // ─── DATA STRUCTURE ───
 const FILIERES = {
@@ -1318,10 +1349,9 @@ let DATA = { exercices:[], devoirs:[], livres:[], concours:[] };
 // Charger toutes les données depuis Firebase (une seule collection "ressources")
 async function loadFromFirebase() {
   try {
-    const snap = await db.collection('ressources').get();
+    const docs = await fbGetCollection('ressources');
     DATA = { exercices:[], devoirs:[], livres:[], concours:[] };
-    snap.forEach(d => {
-      const item = { _id: d.id, ...d.data() };
+    docs.forEach(item => {
       const normalized = {
         _id: item._id,
         filiere: (item['filière'] || item['filiere'] || '').trim(),
@@ -1335,7 +1365,6 @@ async function loadFromFirebase() {
       };
       normalized.cours = normalized.titre;
       normalized.nom = normalized.titre;
-
       const cat = (item['catégorie'] || item['categorie'] || item['type'] || '').toLowerCase().trim();
       if(cat.includes('exercice')) DATA.exercices.push(normalized);
       else if(cat.includes('devoir') || cat.includes('ds')) DATA.devoirs.push(normalized);
@@ -1364,8 +1393,8 @@ async function saveToFirebase(type, item) {
       'auteur': item.auteur || '',
       'annee': item.annee || '',
     };
-    const docRef = await db.collection('ressources').add(firebaseDoc);
-    item._id = docRef.id;
+    const id = await fbAddDoc('ressources', firebaseDoc);
+    item._id = id;
     DATA[type].push(item);
     updateTotalDocs();
     if(currentFiliere) renderContent();
@@ -1382,7 +1411,7 @@ async function deleteFromFirebase(type, index) {
   const item = DATA[type][index];
   if(!item._id) { alert('Erreur: document sans ID'); return; }
   try {
-    await db.collection('ressources').doc(item._id).delete();
+    await fbDeleteDoc('ressources', item._id);
     DATA[type].splice(index, 1);
     updateTotalDocs();
     renderDeleteList();
