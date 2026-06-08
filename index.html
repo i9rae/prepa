@@ -548,7 +548,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 .sli-url { font-size: 0.72rem; color: var(--ink3); font-family: 'DM Mono', monospace; margin-top: 1px; }
 
 @media(max-width:900px) {
-  .sites-utiles-btn { display: none; }
+  .sites-utiles-btn { font-size: 0.75rem; padding: 6px 10px; }
 }
 
   background:white;
@@ -959,6 +959,70 @@ body { background:var(--bg); color:var(--ink); font-family:'Bricolage Grotesque'
 
         <!-- Contenu dynamique -->
         <div id="content-area"></div>
+      </div>
+    </div>
+
+    <!-- SITES UTILES VIEW (mobile + desktop) -->
+    <div id="view-sites" style="display:none;">
+      <div style="padding:1.5rem 2rem;">
+        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;margin-bottom:.4rem;">Sites utiles</div>
+        <div style="font-size:0.85rem;color:var(--ink3);margin-bottom:1.5rem;">Ressources en ligne pour les classes préparatoires</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <a href="https://lgarcin.github.io/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📐</span><div><div class="sli-title">Cours de Mathématiques</div><div class="sli-url">lgarcin.github.io</div></div>
+          </a>
+          <a href="http://laminehoucin.blogspot.com/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📚</span><div><div class="sli-title">Blog Lamine Houcin</div><div class="sli-url">laminehoucin.blogspot.com</div></div>
+          </a>
+          <a href="https://www.mpsi-saintbrieuc.fr/devoirs-de-maths" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">✏️</span><div><div class="sli-title">Devoirs de Maths MPSI</div><div class="sli-url">mpsi-saintbrieuc.fr</div></div>
+          </a>
+          <a href="https://e-preparatoire.blogspot.com/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🎓</span><div><div class="sli-title">E-Préparatoire</div><div class="sli-url">e-preparatoire.blogspot.com</div></div>
+          </a>
+          <a href="http://desaintar.free.fr/ds.php" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📝</span><div><div class="sli-title">Devoirs Surveillés</div><div class="sli-url">desaintar.free.fr</div></div>
+          </a>
+          <a href="https://www.booleanopera.fr/DM_MPSI.php" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🔢</span><div><div class="sli-title">DM MPSI — Boolean Opera</div><div class="sli-url">booleanopera.fr</div></div>
+          </a>
+          <a href="https://maths-france.fr/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🇫🇷</span><div><div class="sli-title">Maths France</div><div class="sli-url">maths-france.fr</div></div>
+          </a>
+          <a href="https://elearning-cpge.com/biblio-ouvrages/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📖</span><div><div class="sli-title">Bibliothèque CPGE</div><div class="sli-url">elearning-cpge.com</div></div>
+          </a>
+          <a href="https://christophebertault.fr/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">👨‍🏫</span><div><div class="sli-title">Christophe Bertault</div><div class="sli-url">christophebertault.fr</div></div>
+          </a>
+          <a href="http://alain.troesch.free.fr/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📐</span><div><div class="sli-title">Alain Troesch</div><div class="sli-url">alain.troesch.free.fr</div></div>
+          </a>
+          <a href="https://mickaelprost.fr/index.html" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🧮</span><div><div class="sli-title">Mickaël Prost</div><div class="sli-url">mickaelprost.fr</div></div>
+          </a>
+          <a href="https://www.iamateacher.org/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🎯</span><div><div class="sli-title">I Am A Teacher</div><div class="sli-url">iamateacher.org</div></div>
+          </a>
+          <a href="https://mathscpge.wordpress.com/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">∑</span><div><div class="sli-title">Maths CPGE</div><div class="sli-url">mathscpge.wordpress.com</div></div>
+          </a>
+          <a href="https://mathematiques.elodiebouchet.fr/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📊</span><div><div class="sli-title">Élodie Bouchet — Mathématiques</div><div class="sli-url">mathematiques.elodiebouchet.fr</div></div>
+          </a>
+          <a href="https://inglart-maths.ovh/" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">📐</span><div><div class="sli-title">Inglart Maths</div><div class="sli-url">inglart-maths.ovh</div></div>
+          </a>
+          <a href="https://mathcpge.org/DevoirsMathsPCSI.html" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">✏️</span><div><div class="sli-title">Devoirs Maths PCSI</div><div class="sli-url">mathcpge.org</div></div>
+          </a>
+          <a href="https://www.alkendy.ma/PageMPSI.htm" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🇲🇦</span><div><div class="sli-title">Alkendy — MPSI Maroc</div><div class="sli-url">alkendy.ma</div></div>
+          </a>
+          <a href="https://www.math93.com/index.php/superieur/maths-sup" target="_blank" class="site-link-item" style="border:1.5px solid var(--border);border-radius:8px;">
+            <span class="sli-icon">🔢</span><div><div class="sli-title">Math93 — Maths Sup</div><div class="sli-url">math93.com</div></div>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -1434,12 +1498,14 @@ function showHome() {
   currentFiliere = null;
   document.getElementById('view-home').style.display = 'block';
   document.getElementById('view-filiere').style.display = 'none';
+  document.getElementById('view-sites').style.display = 'none';
   document.getElementById('breadcrumb').innerHTML = '<span>Accueil</span>';
 }
 
 function showFiliere() {
   document.getElementById('view-home').style.display = 'none';
   document.getElementById('view-filiere').style.display = 'block';
+  document.getElementById('view-sites').style.display = 'none';
 
   document.getElementById('fh-badge').textContent = currentFiliere.name;
   document.getElementById('fh-badge').style.background = currentFiliere.color;
@@ -1802,13 +1868,20 @@ async function addConcours() {
 }
 
 function showSitesMobile() {
-  const panel = document.getElementById('sites-utiles-panel');
-  if(panel) { panel.style.display = 'block'; panel.style.top = '54px'; panel.style.width = '100vw'; panel.style.borderRadius = '0'; }
+  document.getElementById('view-home').style.display = 'none';
+  document.getElementById('view-filiere').style.display = 'none';
+  document.getElementById('view-sites').style.display = 'block';
+  document.getElementById('breadcrumb').innerHTML = '<span onclick="showHome()" style="cursor:pointer;color:var(--ink3);">Accueil</span><span class="sep"> / </span><span>Sites utiles</span>';
 }
 
 function toggleSitesUtiles() {
   const panel = document.getElementById('sites-utiles-panel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  const sitesView = document.getElementById('view-sites');
+  if(window.innerWidth <= 900) {
+    showSitesMobile();
+  } else {
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  }
 }
 
 // Fermer le panel si on clique ailleurs
